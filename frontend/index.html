@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper-Loom - 学术论文转Markdown</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header>
+            <h1>📄 Paper-Loom</h1>
+            <p class="subtitle">学术论文 PDF → Markdown 转换工具</p>
+        </header>
+
+        <!-- 上传区域 -->
+        <section class="upload-section">
+            <div class="upload-box" id="uploadBox">
+                <input type="file" id="fileInput" accept=".pdf" hidden>
+                <div class="upload-content">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p>点击或拖拽PDF文件到此处</p>
+                    <p class="file-hint">支持最大 50MB 的PDF文件</p>
+                </div>
+            </div>
+
+            <!-- OCR模型选择 -->
+            <div class="model-selector">
+                <label>OCR模型大小：</label>
+                <select id="ocrModel">
+                    <option value="small" selected>Small（快速，8MB）</option>
+                    <option value="base">Base（精确，25MB）</option>
+                </select>
+            </div>
+
+            <button id="processBtn" class="btn-primary" disabled>开始处理</button>
+        </section>
+
+        <!-- 状态显示 -->
+        <section class="status-section" id="statusSection" style="display: none;">
+            <div class="status-card">
+                <div class="loading-spinner"></div>
+                <p id="statusText">正在处理中...</p>
+            </div>
+        </section>
+
+        <!-- 结果预览 -->
+        <section class="result-section" id="resultSection" style="display: none;">
+            <div class="result-header">
+                <h2>✅ 处理完成</h2>
+                <button id="downloadBtn" class="btn-download">📥 下载 Markdown</button>
+            </div>
+
+            <!-- 统计信息 -->
+            <div class="stats" id="stats"></div>
+
+            <!-- Markdown预览 -->
+            <div class="preview-container">
+                <h3>Markdown 预览：</h3>
+                <div class="markdown-preview" id="markdownPreview"></div>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

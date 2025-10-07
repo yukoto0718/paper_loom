@@ -1,0 +1,23 @@
+{
+  "models-dir": "./models",
+  "device-mode": "cuda",
+  
+  "table-config": {
+    "is_table_recog_enable": false,
+    "model": "RapidTable",
+    "max_time": 400
+  },
+  
+  "ocr-config": {
+    "enable": true,
+    "lang": "en",
+    "rec_model_name": "en_PP-OCRv4_rec",
+    "det_model_name": "en_PP-OCRv4_det"
+  },
+  
+  "formula-config": {
+    "enable": true,
+    "mfd_model": "yolov8",
+    "mfr_model": "unimernet"
+  }
+}

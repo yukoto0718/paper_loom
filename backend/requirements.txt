@@ -1,0 +1,32 @@
+# 注意：根据系统选择正确的requirements文件
+# Windows GPU: requirements_windows.txt
+# Mac M1: requirements_mac.txt
+
+# 这个文件列出通用依赖
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+python-multipart==0.0.20
+python-dotenv==1.0.1
+aiofiles==24.1.0
+loguru==0.7.3
+pydantic==2.10.3
+pydantic-settings==2.7.0
+
+# OCR相关
+paddleocr==2.9.2
+pymupdf==1.25.3
+Pillow==11.0.0
+opencv-python==4.10.0.84
+numpy==1.26.4
+
+# 深度学习 (GPU版本)
+torch>=2.8.0
+torchvision>=0.19.0
+torchaudio>=2.8.0
+transformers==4.47.1
+ultralytics==8.3.50
+huggingface-hub==0.26.5
+
+# PDF处理工具包
+pdf-extract-kit
+mineru[core]>=2.5.4
