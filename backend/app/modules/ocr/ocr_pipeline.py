@@ -12,8 +12,10 @@ from loguru import logger
 try:
     import torch
     CUDA_AVAILABLE = torch.cuda.is_available()
+    MPS_AVAILABLE = torch.backends.mps.is_available()
 except ImportError:
     CUDA_AVAILABLE = False
+    MPS_AVAILABLE = False
 
 class OCRPipeline:
     """
@@ -23,7 +25,13 @@ class OCRPipeline:
     
     def __init__(self, ocr_model_size: str = "small"):
         self.ocr_model_size = ocr_model_size
-        self.device = "cuda" if CUDA_AVAILABLE else "cpu"
+        # 智能设备检测：优先使用 CUDA，然后是 MPS，最后是 CPU
+        if CUDA_AVAILABLE:
+            self.device = "cuda"
+        elif MPS_AVAILABLE:
+            self.device = "mps"
+        else:
+            self.device = "cpu"
         self.mineru_available = self._check_mineru_available()
     
     def _check_mineru_available(self):
@@ -103,7 +111,7 @@ class OCRPipeline:
         """
         logger.info("调用 MinerU...")
         
-        # 构建命令 - 使用GPU加速
+        # 构建命令 - 使用智能设备检测
         cmd = [
             "mineru",
             "-p", str(pdf_path),
@@ -114,12 +122,12 @@ class OCRPipeline:
             "--lang", "en",             # 英文OCR
             "-t", "false",              # ❗表格截图模式（不识别）
             "-f", "true",               # 公式识别
-            "-d", "cuda",               # 🚀 使用GPU加速 (你的RTX 4060)
+            "-d", self.device,          # 🚀 使用智能设备检测
         ]
         
         logger.info(f"执行命令: {' '.join(cmd)}")
         
-        # Windows兼容的异步执行
+        # 跨平台异步执行
         try:
             # 使用线程池执行同步subprocess
             import concurrent.futures
@@ -131,7 +139,7 @@ class OCRPipeline:
                     capture_output=True,
                     text=True,
                     timeout=300,  # 5分钟超时
-                    shell=True    # Windows需要shell=True
+                    shell=False   # macOS/Linux 不需要 shell=True
                 )
                 return result
             

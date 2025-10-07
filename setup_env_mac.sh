@@ -41,3 +41,7 @@ pip install magic-pdf[full]==1.3.12
 echo ""
 echo "✅ 环境配置完成！"
 echo ""
+echo "接下来："
+echo "1. cd backend/app"
+echo "2. python main.py"
+echo ""

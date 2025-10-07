@@ -9,11 +9,18 @@ from pathlib import Path
 from typing import Dict
 from loguru import logger
 
+# 支持 PyPDF2 和 pypdf（PyPDF2 的现代替代品）
 try:
     import PyPDF2
     PYPDF2_AVAILABLE = True
 except ImportError:
     PYPDF2_AVAILABLE = False
+
+try:
+    import pypdf
+    PYPDF_AVAILABLE = True
+except ImportError:
+    PYPDF_AVAILABLE = False
 
 
 class FallbackPipeline:
@@ -22,8 +29,8 @@ class FallbackPipeline:
     """
     
     def __init__(self):
-        if not PYPDF2_AVAILABLE:
-            raise RuntimeError("PyPDF2 not available for fallback processing")
+        if not PYPDF2_AVAILABLE and not PYPDF_AVAILABLE:
+            raise RuntimeError("PyPDF2 or pypdf not available for fallback processing")
     
     async def process(self, pdf_path: Path, output_dir: Path) -> Dict:
         """
@@ -62,18 +69,32 @@ class FallbackPipeline:
             raise
     
     def _extract_pdf_text(self, pdf_path: Path) -> str:
-        """Extract text from PDF using PyPDF2"""
+        """Extract text from PDF using PyPDF2 or pypdf"""
         try:
-            with open(pdf_path, 'rb') as f:
-                pdf_reader = PyPDF2.PdfReader(f)
-                text_content = ""
-                
-                for page_num, page in enumerate(pdf_reader.pages, 1):
-                    page_text = page.extract_text()
-                    if page_text:
-                        text_content += f"--- Page {page_num} ---\n{page_text}\n\n"
-                
-                return text_content
+            if PYPDF2_AVAILABLE:
+                with open(pdf_path, 'rb') as f:
+                    pdf_reader = PyPDF2.PdfReader(f)
+                    text_content = ""
+                    
+                    for page_num, page in enumerate(pdf_reader.pages, 1):
+                        page_text = page.extract_text()
+                        if page_text:
+                            text_content += f"--- Page {page_num} ---\n{page_text}\n\n"
+                    
+                    return text_content
+            elif PYPDF_AVAILABLE:
+                with open(pdf_path, 'rb') as f:
+                    pdf_reader = pypdf.PdfReader(f)
+                    text_content = ""
+                    
+                    for page_num, page in enumerate(pdf_reader.pages, 1):
+                        page_text = page.extract_text()
+                        if page_text:
+                            text_content += f"--- Page {page_num} ---\n{page_text}\n\n"
+                    
+                    return text_content
+            else:
+                raise RuntimeError("No PDF library available")
                 
         except Exception as e:
             raise Exception(f"PDF文本提取失败: {e}")
@@ -99,10 +120,16 @@ class FallbackPipeline:
     
     def _generate_stats(self, pdf_path: Path, text_content: str) -> Dict:
         """Generate basic statistics"""
+        page_count = 0
         try:
-            with open(pdf_path, 'rb') as f:
-                pdf_reader = PyPDF2.PdfReader(f)
-                page_count = len(pdf_reader.pages)
+            if PYPDF2_AVAILABLE:
+                with open(pdf_path, 'rb') as f:
+                    pdf_reader = PyPDF2.PdfReader(f)
+                    page_count = len(pdf_reader.pages)
+            elif PYPDF_AVAILABLE:
+                with open(pdf_path, 'rb') as f:
+                    pdf_reader = pypdf.PdfReader(f)
+                    page_count = len(pdf_reader.pages)
         except:
             page_count = 0
         
