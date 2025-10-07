@@ -1,6 +1,15 @@
 # paper_loom
 
-A new Flutter project.
+Paper-Loom - 学術論文向けPDFリーダーの試作（開発初期段階） 、3つのAI機能を構想中：
+
+>OCRによるPDF最適化・読みやすい形式への変換
+>プロンプトベースのAI質問機能
+>引用関係による論文推薦システム
+
+技術構成：Flutter（フロントエンド試作）+ Python FastAPI（バックエンド予定）
+タグ：#AI支援開発 #学術ツール #開発中 #Flutter #vibe-coding
+
+![screenshot](images/screenshot1.png)
 
 ## Getting Started
 
