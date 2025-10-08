@@ -45,6 +45,9 @@ dependencies:
   
   # 网络请求库
   dio: ^5.4.0
+  
+  # ZIP 文件处理
+  archive: ^3.4.0
 
 dev_dependencies:
   flutter_test:
