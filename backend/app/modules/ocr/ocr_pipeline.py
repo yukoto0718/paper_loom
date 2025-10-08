@@ -88,6 +88,11 @@ class OCRPipeline:
                 markdown_content=markdown
             )
             
+            # 5. 自动清理 mineru_temp 临时文件夹
+            if temp_output.exists():
+                shutil.rmtree(temp_output)
+                logger.info(f"✅ 已自动清理 mineru_temp 临时文件夹: {temp_output}")
+            
             logger.info("✅ MinerU 处理完成！")
             
             return {
@@ -102,6 +107,7 @@ class OCRPipeline:
             # 清理临时文件
             if temp_output.exists():
                 shutil.rmtree(temp_output)
+                logger.info(f"✅ 已清理失败的 mineru_temp 临时文件夹: {temp_output}")
             # 使用备用方案
             return await self._use_fallback(pdf_path, output_dir)
     
