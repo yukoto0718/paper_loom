@@ -196,13 +196,13 @@ async def get_status(job_id: str):
         current_step = "正在识别文本和公式"
         if 'started_at' in status:
             started_time = datetime.fromisoformat(status['started_at'].replace('Z', '+00:00'))
-            elapsed_time = int((datetime.utcnow() - started_time).total_seconds())
+            elapsed_time = int((datetime.utcnow().replace(tzinfo=started_time.tzinfo) - started_time).total_seconds())
     elif status['status'] == 'completed':
         progress = 100
         current_step = "处理完成"
         if 'started_at' in status and 'result' in status:
             started_time = datetime.fromisoformat(status['started_at'].replace('Z', '+00:00'))
-            completed_time = datetime.utcnow()
+            completed_time = datetime.utcnow().replace(tzinfo=started_time.tzinfo)
             elapsed_time = int((completed_time - started_time).total_seconds())
 
     # 返回标准格式响应

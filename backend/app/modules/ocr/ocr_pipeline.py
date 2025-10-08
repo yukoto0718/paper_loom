@@ -4,6 +4,7 @@ import subprocess
 import json
 import shutil
 import sys
+import os
 import asyncio
 from pathlib import Path
 from typing import Dict
@@ -140,22 +141,39 @@ class OCRPipeline:
             loop = asyncio.get_event_loop()
             
             def run_mineru_sync():
-                result = subprocess.run(
-                    cmd,
-                    capture_output=True,
-                    text=True,
-                    timeout=300,  # 5分钟超时
-                    shell=False   # macOS/Linux 不需要 shell=True
-                )
-                return result
+                try:
+                    result = subprocess.run(
+                        cmd,
+                        capture_output=True,
+                        text=True,
+                        timeout=300,  # 5分钟超时
+                        shell=False,  # macOS/Linux 不需要 shell=True
+                        env={**os.environ, 'PYTHONUNBUFFERED': '1'}  # 确保输出不被缓冲
+                    )
+                    return result
+                except subprocess.TimeoutExpired as e:
+                    logger.error(f"MinerU 处理超时: {e}")
+                    raise
+                except Exception as e:
+                    logger.error(f"MinerU 执行异常: {e}")
+                    raise
             
-            # 在线程池中运行
-            with concurrent.futures.ThreadPoolExecutor() as pool:
+            # 在线程池中运行，确保资源正确清理
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
                 result = await loop.run_in_executor(pool, run_mineru_sync)
             
             if result.returncode != 0:
                 error_msg = result.stderr if result.stderr else result.stdout
-                logger.error(f"MinerU 处理失败: {error_msg}")
+                logger.error(f"MinerU 处理失败 (返回码: {result.returncode}): {error_msg}")
+                
+                # 清理可能的临时文件
+                if output_dir.exists():
+                    try:
+                        shutil.rmtree(output_dir)
+                        logger.info(f"已清理失败的输出目录: {output_dir}")
+                    except Exception as cleanup_error:
+                        logger.warning(f"清理输出目录失败: {cleanup_error}")
+                
                 raise Exception(f"MinerU 处理失败: {error_msg}")
             
             logger.info("✅ MinerU 处理完成")
