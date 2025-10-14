@@ -45,6 +45,14 @@ dependencies:
   
   # 网络请求库
   dio: ^5.4.0
+  
+  # ZIP 文件处理
+  archive: ^3.4.0
+  
+  # Markdown 渲染和 LaTeX 支持
+  flutter_markdown: ^0.6.18
+  flutter_math_fork: ^0.7.1
+  url_launcher: ^6.2.0
 
 dev_dependencies:
   flutter_test:
